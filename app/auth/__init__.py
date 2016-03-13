@@ -7,7 +7,7 @@ import jwt
 from flask_restful import Resource
 from oauth2client import client, crypt
 
-class Auth(Resource):
+class Auth():
     @staticmethod
     def require_api_token(func):
         from functools import wraps
@@ -76,6 +76,7 @@ class Auth(Resource):
         return user
 
     @staticmethod
-    def get_user_from_id(self,id):
+    def get_user_from_id(id):
         user = User.query.filter(User.id == id).first()
+        #print(user.email)
         return [user if not None else False]

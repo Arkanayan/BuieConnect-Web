@@ -21,8 +21,9 @@ user_fields = {
     'reg_date' : fields.DateTime,
     'url' : fields.Url('apiv1.user', absolute=True)
 }
-from marshmallow import Schema, fields as filds
+from marshmallow import Schema, fields as filds, pre_load, post_load, post_dump
 from flask import url_for
+from marshmallow_sqlalchemy import ModelSchema
 
 class NoticeClass(object):
     def __init__(self, id, title, message):
@@ -30,6 +31,34 @@ class NoticeClass(object):
         self.title = title
         self.message = message
 
+
+
+class BaseSchema(ModelSchema):
+    __envelope__ = {
+        'single': "key",
+        'many': "keys"
+    }
+    __model__ = User
+
+    def get_envelope_key(self, many):
+        """Helper to get the envelope key."""
+        key = self.__envelope__['many'] if many else self.__envelope__['single']
+        assert key is not None, "Envelope key undefined"
+        return key
+
+    @pre_load(pass_many=True)
+    def unwrap_envelope(self, data, many):
+        key = self.get_envelope_key(many)
+        return data[key]
+
+    @post_dump(pass_many=True)
+    def wrap_with_envelope(self, data, many):
+        key = self.get_envelope_key(many)
+        return {key: data}
+
+    @post_load
+    def make_object(self, data):
+        return self.__model__(**data)
 
 
 class NoticeSchema(Schema):
@@ -41,15 +70,24 @@ class NoticeSchema(Schema):
     def notice_url(self, obj):
         return url_for('apiv1.notice', id=obj.id, _external=True)
 
-from marshmallow_sqlalchemy import ModelSchema
 
 
 class RoleSchema(ModelSchema):
     class Meta:
         model = Role
 
-class UserSchema(ModelSchema):
-    class Meta:
+
+class UserSchema(BaseSchema):
+    """
+    Marshmallow schema for User model
+    """
+    __envelope__ = {
+        'single': 'user',
+        'many': 'users',
+    }
+    __model__ = User
+
+    class Meta(BaseSchema.Meta):
         model = User
         exclude = ("active",)
 
