@@ -36,12 +36,15 @@ class User(db.Model):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
-    def __init__(self, email, firstName, lastName, google_sub, roles=None):
+    def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id, roles=None):
         self.email = email
         self.firstName = firstName
         self.lastName = lastName
         self.google_sub = google_sub
-        self.roles = [roles if not None else Role.query.filter_by(name='user').first()]
+        self.gcm_reg_id = gcm_reg_id
+        if roles is None:
+            roles = Role.query.get(1)
+        self.roles = [roles]
 
     def get_auth_token(self):
         """Generates user token
@@ -60,6 +63,8 @@ class User(db.Model):
         user_string = jwt.decode(token, key=app.config.get('SECRET_KEY'))
         google_sub = user_string['google_sub']
         return User.query.filter_by(google_sub=google_sub).first() or None
+
+
 
     # check if the user is admin or not
     def is_admin(self):

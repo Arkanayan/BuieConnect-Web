@@ -1,3 +1,4 @@
+import os
 # Config Class
 class Config(object):
     SECRET_KEY = 'secret'
@@ -9,6 +10,7 @@ class Config(object):
     SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
     #SECURITY_TRACKABLE = True
     SECURITY_PASSWORD_SALT = 'something_super_secret_change_in_production'
+    CLIENT_ID = os.getenv("CLIENT_ID", None)
 
 # config for testing purposes
 class DevelopmentConfig(Config):

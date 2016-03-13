@@ -30,22 +30,56 @@ def secret(token):
     user = User.get_user_from_token(token)
     return user.firstName
 
-@app.route('/token')
-def token():
-    return User.query.filter_by(firstName='arka').first().get_auth_token()
-
-@app.route('/log')
-def log():
-    user = User.query.first()
-    role = user.roles[0]
-    print("name: {} ; desc: {}".format(role.name, role.description))
-    return str(user.get_auth_token())
+from oauth2client import  client, crypt
 
 
-@app.route('/dummy-api/', methods=['GET'])
-def dummyAPI():
-    ret_dict = {
-        "Key1": "Value1",
-        "Key2": "value2"
-    }
-    return jsonify(items=ret_dict)
+def get_info_from_google_id_token(id_token):
+    """ Parses google id_token and returns user info
+    :param id_token: token received from google
+    :return: dict of user info
+    """
+    CLIENT_ID = app.config.get('CLIENT_ID')
+    print(CLIENT_ID)
+    try:
+        idinfo = client._extract_id_token(id_token=id_token)
+
+        if idinfo['aud'] not in [CLIENT_ID]:
+             raise crypt.AppIdentityError("Unrecognized client.")
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise crypt.AppIdentityError("Wrong issuer.")
+    except crypt.AppIdentityError:
+        # Invalid token
+        print("invalid token")
+        return "Invalid token", 401
+    return idinfo
+
+
+def check_user_exists(google_sub):
+    """
+    Check if the user exists
+    :param google_sub: subject field from google data
+    :return: user if exists else false
+    """
+    user = User.query.filter_by(google_sub=google_sub).first()
+    return user if not None else False
+
+
+def register_user(google_info):
+    """
+    Register user from the info from google
+    :param google_info: Info got from google
+    :return: registered user or None
+    """
+    email = google_info['email']
+    firstName = google_info['given_name']
+    lastName = google_info['family_name']
+    google_sub = google_info['sub']
+    user = User(email, firstName, lastName, google_sub)
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+
+def get_user_from_id(id):
+    user = User.query.get(id)
+    return [user if not None else False]
