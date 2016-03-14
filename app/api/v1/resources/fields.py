@@ -1,5 +1,5 @@
 from flask.ext.restful import fields
-from app.models import User, Role
+from app.models import User, Role, Error
 
 
 notice_fields = {
@@ -21,9 +21,14 @@ user_fields = {
     'reg_date' : fields.DateTime,
     'url' : fields.Url('apiv1.user', absolute=True)
 }
+
+token_fields = {
+    'token' : fields.String
+}
 from marshmallow import Schema, fields as filds, pre_load, post_load, post_dump
 from flask import url_for
-from marshmallow_sqlalchemy import ModelSchema
+from app import marsh
+
 
 class NoticeClass(object):
     def __init__(self, id, title, message):
@@ -33,11 +38,12 @@ class NoticeClass(object):
 
 
 
-class BaseSchema(ModelSchema):
+class BaseSchema(marsh.ModelSchema):
     __envelope__ = {
         'single': "key",
         'many': "keys"
     }
+
     __model__ = User
 
     def get_envelope_key(self, many):
@@ -72,7 +78,7 @@ class NoticeSchema(Schema):
 
 
 
-class RoleSchema(ModelSchema):
+class RoleSchema(marsh.ModelSchema):
     class Meta:
         model = Role
 
@@ -92,11 +98,25 @@ class UserSchema(BaseSchema):
         exclude = ("active",)
 
     roles = filds.Nested(RoleSchema, many=True, exclude=('id','description','users',))
-    url = filds.Method('user_url')
+    #url = filds.Method('user_url')
+    url = marsh.URLFor('apiv1.user', id='<id>', _external=True)
 
-    def user_url(self, obj):
-        return url_for('apiv1.user', id=obj.id, _external=True)
+    # def user_url(self, obj):
+    #     return url_for('apiv1.user', id=obj.id, _external=True)
 
 
+class LoginSchema(marsh.Schema):
+    login_error_messages = {
+        'required': 'Error: id_token is required for login',
+    }
+    id_token = filds.String(required=True, error_messages=login_error_messages)
 
 
+class ErrorSchema(BaseSchema):
+    __envelope__ = {
+        'single': 'error',
+        'many' : 'errors',
+    }
+
+    message = filds.String()
+    code = filds.Integer()

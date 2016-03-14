@@ -22,6 +22,6 @@ apiv1.add_resource(Notice, '/notice/<int:id>', endpoint='notice')
 apiv1.add_resource(UserAuth, '/login', endpoint='login')
 
 # Add User resource to rest api
-apiv1.add_resource(UserManager, '/user/<int:id>', '/users', '/users/<int:id>/<int:limit>', endpoint='user')
+apiv1.add_resource(UserManager, '/users/<int:id>', '/users', '/users/<int:id>/<int:limit>', endpoint='user')
 
 

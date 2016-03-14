@@ -36,7 +36,7 @@ class User(db.Model):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
-    def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id, roles=None):
+    def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id=None, roles=None):
         self.email = email
         self.firstName = firstName
         self.lastName = lastName
@@ -85,6 +85,12 @@ class User(db.Model):
 
     def get_google_sub(self):
         return self.google_sub
+
+
+class Error:
+    def __init__(self, message, code):
+        self.message = message
+        self.code = code
 
 
 

@@ -1,6 +1,8 @@
 from flask import Flask
 from app.config import *
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+
 
 # Define flask app instance
 app = Flask(__name__)
@@ -10,6 +12,8 @@ app.config.from_object(DevelopmentConfig)
 # Initialize the database
 db = SQLAlchemy(app)
 
+# Initialize flask marshmallow object
+marsh = Marshmallow(app)
 
 # Import views
 from app import views

@@ -41,12 +41,15 @@ class Auth():
             idinfo = client._extract_id_token(id_token=id_token)
 
             if idinfo['aud'] not in [CLIENT_ID]:
-                 raise crypt.AppIdentityError("Unrecognized client.")
+                #raise crypt.AppIdentityError("Unrecognized client.")
+                return False
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
                 raise crypt.AppIdentityError("Wrong issuer.")
         except crypt.AppIdentityError:
             # Invalid token
             return "Invalid token", 401
+        except Exception:
+            return False
         return idinfo
 
     @staticmethod
