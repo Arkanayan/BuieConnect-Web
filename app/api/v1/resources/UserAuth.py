@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from app.auth import Auth
+from app import Auth
 from .fields import LoginSchema, ErrorSchema, Error
 from flask import request
 from flask_restful import marshal
@@ -15,7 +15,7 @@ class UserAuth(Resource):
     def post(self):
         """
         Handles login function
-        :return: auth token
+        :return: Auth token
         """
         # self.reqparse.add_argument('id_token', type=str, required=True,
         #                       help="No id_token provided", location='json')

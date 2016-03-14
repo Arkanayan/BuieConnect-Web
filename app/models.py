@@ -58,14 +58,6 @@ class User(db.Model):
         token = jwt.encode(struct, key=app.config.get('SECRET_KEY'))
         return token
 
-    @staticmethod
-    def get_user_from_token(token):
-        user_string = jwt.decode(token, key=app.config.get('SECRET_KEY'))
-        google_sub = user_string['google_sub']
-        return User.query.filter_by(google_sub=google_sub).first() or None
-
-
-
     # check if the user is admin or not
     def is_admin(self):
         admin_role = Role.query.filter_by(name='admin').first()

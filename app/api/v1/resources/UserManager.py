@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, marshal_with, marshal
 from app.models import User
 from .fields import user_fields
-from app.auth import Auth
+from app import Auth
 from flask import abort
 from marshmallow import pprint
 from app.models import Error
@@ -67,7 +67,10 @@ class UserManager(Resource):
             user = items
         return user
 
-    def put(self, id):
+    @Auth.require_admin
+    def put(self, id=None):
+        if id is None:
+            return get_error_json("Please provide an user id", 400)
         user = Auth.get_user_from_id(id)
         print(len(user))
         many = self.if_many(user)
