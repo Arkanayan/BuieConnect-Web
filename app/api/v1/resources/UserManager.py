@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse, marshal_with, marshal, originaflask_make_response
+from flask_restful import Resource, reqparse, marshal_with, marshal
 from app.models import User, Error
 from .fields import user_fields
 from app import Auth
@@ -7,7 +7,7 @@ from marshmallow import pprint
 from app.models import Error
 from .fields import UserSchema, ErrorSchema
 from .utils import get_error_json, get_users_json
-from app.exceptions import UserNotFound
+from app.exceptions import UserNotFound, InvalidUsage
 
 class UserManager(Resource):
     """
@@ -32,13 +32,16 @@ class UserManager(Resource):
             #pprint(result.data)
             return get_users_json(users, many=True)
         if id is not None:
-            try:
-                user = User.query.filter(User.id == id).first()
-                if user is None:
-                    raise UserNotFound
-                return get_users_json(user, False)
-            except:
-                return get_error_json("User not found", 404)
+
+            user = User.query.filter(User.id == id).first()
+            if user is None:
+                raise UserNotFound()
+            return get_users_json(user, False)
+            # except:
+            #     #return get_error_json("User not found", 404)
+            #     #raise InvalidUsage("User not found", status_code=404)
+            #     errors = {'error1': 'message here', 'error2': 'message error 2'}
+            #     raise UserNotFound(errors=[errors, {'2': 'message2'}])
 
     def get_currect_num_items(self, items):
         if len(items) >= 1:
