@@ -1,5 +1,5 @@
-from flask_restful import Resource, reqparse, marshal_with, marshal
-from app.models import User
+from flask_restful import Resource, reqparse, marshal_with, marshal, originaflask_make_response
+from app.models import User, Error
 from .fields import user_fields
 from app import Auth
 from flask import abort
@@ -21,18 +21,17 @@ class UserManager(Resource):
         return many
 
 
-    #@marshal_with(user_fields, envelope="user")
-    def get(self, id=None, limit=None):
-        if id is None and limit is None:
+    #@marshal_with(user_fields)
+    def get(self, id=None):
+        if id is None:
             try:
                 users = User.query.limit(5).all()
             except:
                 get_error_json("Users not found", 404)
-            many = True if len(users) > 1 else False
             # result = self.schema.dump(users, many=many)
             #pprint(result.data)
-            return get_users_json(users, many)
-        if id is not None and limit is None:
+            return get_users_json(users, many=True)
+        if id is not None:
             try:
                 user = User.query.filter(User.id == id).first()
                 if user is None:
@@ -40,25 +39,6 @@ class UserManager(Resource):
                 return get_users_json(user, False)
             except:
                 return get_error_json("User not found", 404)
-            # result = self.schema.dump(user)
-        if id is not None and limit is not None:
-            try:
-                users = User.query.offset(id-1).limit(limit).all()
-            except:
-                return get_error_json("User not found", 404)
-            print(len(users))
-            many = True if len(users) > 1 else False
-            #user = [users[0] if len(users) <= 1 else users]
-            #user = self.get_currect_num_items(users)
-            #result = self.schema.dump(user, many=True)
-        #print(user.email)
-        # if user is not None:
-        #     return user
-        # else:
-        #     abort(404)
-        #return user if user is not None else abort(404)
-            #pprint(result.data)
-            return get_users_json(users, many)
 
     def get_currect_num_items(self, items):
         if len(items) >= 1:
@@ -77,5 +57,13 @@ class UserManager(Resource):
         user = self.get_currect_num_items(user)
         result = self.schema.dump(user, many=many)
         return result.data
+
+    def post(self):
+        list = [
+            Error("this is error 1", 401),
+            Error("This is error 2", 405)
+        ]
+        error = Error("This is main error", 201, list)
+        return get_error_json("This is main error", 400, list)
 
 

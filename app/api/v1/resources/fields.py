@@ -83,7 +83,7 @@ class RoleSchema(marsh.ModelSchema):
         model = Role
 
 
-class UserSchema(BaseSchema):
+class UserSchema(marsh.ModelSchema):
     """
     Marshmallow schema for User model
     """
@@ -112,11 +112,9 @@ class LoginSchema(marsh.Schema):
     id_token = filds.String(required=True, error_messages=login_error_messages)
 
 
-class ErrorSchema(BaseSchema):
-    __envelope__ = {
-        'single': 'error',
-        'many' : 'errors',
-    }
+class ErrorSchema(Schema):
 
     message = filds.String()
     code = filds.Integer()
+
+    errors = filds.Nested('ErrorSchema', many=True, exclude=['errors'], dump_only=True)

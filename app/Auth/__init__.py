@@ -47,6 +47,18 @@ def get_user_from_token(token):
     return User.query.filter_by(google_sub=google_sub).first() or None
 
 
+def decode_token(token):
+    """
+    This method decodes the auth token
+    :param token:
+    :return:
+    """
+    try:
+        user_dict = jwt.decode(token, key=app.config.get('SECRET_KEY'))
+        return user_dict
+    except:
+        return None
+
 # @app.route('/secret')
 # @require_api_token
 # def secret(token):
