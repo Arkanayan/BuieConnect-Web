@@ -58,14 +58,14 @@ class UserManager(Resource):
     def put(self, id=None):
         if id is None:
             return get_error_json("Please provide an user id", 400)
-        user = Auth.get_user_from_id(id)
-        if user is not None:
+        try:
+            user = Auth.get_user_from_id(id)
             many = self.if_many(user)
             user = self.get_currect_num_items(user)
             result = self.schema.dump(user, many=many)
             return result.data
-        else:
-            return UserNotFound()
+        except:
+            raise UserNotFound()
 
     def post(self):
         list = [

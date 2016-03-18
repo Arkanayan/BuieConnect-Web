@@ -3,7 +3,7 @@ from app import app, db
 from app.models import User, Role
 from flask import jsonify, request, g
 import jwt
-from app.exceptions import UserNotFound, UserCannotRegister, ErrorNoToken
+from app.exceptions import UserNotFound, UserCannotRegister, ErrorNoToken, InvalidUsage
 from app.api.v1.resources.utils import get_users_json
 
 from flask_restful import Resource
@@ -19,12 +19,16 @@ def require_login(func):
         auth_token = get_token_from_header()
         try:
             user = get_user_from_token(auth_token)
+            #print(type(user))
+            g.user = user
         except UserNotFound:
           info = get_info_from_google_id_token(auth_token)
+          pprint(info)
           try:
             #user = register_user(info)
             #json = get_users_json(user, False)
             #return jsonify, 201
+            pprint(info)
             return jsonify(info)
           except:
             raise UserCannotRegister()
@@ -68,15 +72,16 @@ def get_user_from_token(token):
     """
     try:
         user_string = jwt.decode(token, key=app.config.get('SECRET_KEY'))
-    except:
-        return None
+    except jwt.InvalidTokenError:
+        raise InvalidUsage("Invalid token")
     google_sub = user_string['google_sub']
-    user = User.query.filter_by(google_sub=google_sub).first()
+    user = User.query.filter(User.google_sub == google_sub).first()
+    print("get_user_from_token: email: ", user.email)
     if user is not None:
         g.user = user
         return user
     else:
-        raise UserNotFound()
+        raise UserNotFound
 
 
 def check_valid_user_from_sub(sub):
