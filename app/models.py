@@ -109,9 +109,9 @@ class Academic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User', backref=db.backref('academic', lazy="dynamic"))
-    admission_year = db.Column(db.Integer(4))
-    current_semester = db.Column(db.Integer(2))
-    passout_year = db.Column(db.Integer(4))
+    admission_year = db.Column(db.SmallInteger)
+    current_semester = db.Column(db.SmallInteger)
+    passout_year = db.Column(db.SmallInteger)
     dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
     department = db.relationship('Dept', backref=db.backref('academics', lazy='dynamic'))
 
