@@ -35,6 +35,7 @@ class User(db.Model):
     reg_date = db.Column(db.DateTime, default=datetime.datetime.now())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
+    #notices = db.relationship('Notice', backref=db.backref('author', lazy='dynamic'))
 
     def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id=None, roles=None):
         self.email = email
@@ -85,7 +86,7 @@ class Notice(db.Model):
     title = db.Column(db.String)
     message = db.Column(db.String)
     date_created = db.Column(db.DateTime, default=datetime.datetime.now())
-
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship("User", backref=db.backref('notices', lazy="dynamic"))
 
     def __init__(self, title, message=None, author=None):
@@ -93,6 +94,33 @@ class Notice(db.Model):
         self.message = message
         self.author = author
 
+
+# Department model
+class Dept(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+
+    def __init__(self, name):
+        self.name = name
+
+
+# Academic info model
+class Academic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', backref=db.backref('academic', lazy="dynamic"))
+    admission_year = db.Column(db.Integer(4))
+    current_semester = db.Column(db.Integer(2))
+    passout_year = db.Column(db.Integer(4))
+    dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
+    department = db.relationship('Dept', backref=db.backref('academics', lazy='dynamic'))
+
+    def __init__(self, user, admission_year, current_sem, passout_year, department):
+        self.user = user
+        self.admission_year = admission_year
+        self.current_semester = current_sem
+        self.passout_year = passout_year
+        self.department = department
 
 
 class Error:
