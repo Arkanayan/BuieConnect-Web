@@ -28,3 +28,17 @@ class UserNotFound(InvalidUsage):
         self.message = "User not found"
         self.status_code = 404
         self.errors = []
+
+
+class UserCannotRegister(InvalidUsage):
+    def __init__(self):
+        self.message = "Sorry, couldn't register user"
+        self.status_code = 401
+        self.errors = []
+
+
+class ErrorNoToken(InvalidUsage):
+    def __init__(self):
+        self.message = "No token in header"
+        self.status_code = 401
+        self.errors = []

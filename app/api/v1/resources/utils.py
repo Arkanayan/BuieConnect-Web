@@ -3,7 +3,7 @@ from .fields import ErrorSchema,Error, UserSchema
 from app.models import User
 
 
-def get_error_json(message="There is an error.", code=400, additional_errors=None):
+def get_error_json(message="There is an error.", code=400, additional_errors=[]):
     error_schema = ErrorSchema(many=False)
     error = Error(message=message, code=code, errors=additional_errors)
     return error_schema.dump(error).data, code

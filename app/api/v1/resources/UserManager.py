@@ -23,6 +23,8 @@ class UserManager(Resource):
 
     #@marshal_with(user_fields)
     def get(self, id=None):
+        # When url is /users
+        # returns the list of users
         if id is None:
             try:
                 users = User.query.limit(5).all()
@@ -31,6 +33,8 @@ class UserManager(Resource):
             # result = self.schema.dump(users, many=many)
             #pprint(result.data)
             return get_users_json(users, many=True)
+        # when url is /users/<id>
+        # returns the particular user at <id>
         if id is not None:
 
             user = User.query.filter(User.id == id).first()
@@ -50,16 +54,18 @@ class UserManager(Resource):
             user = items
         return user
 
-    @Auth.require_admin
+    @Auth.require_login
     def put(self, id=None):
         if id is None:
             return get_error_json("Please provide an user id", 400)
         user = Auth.get_user_from_id(id)
-        print(len(user))
-        many = self.if_many(user)
-        user = self.get_currect_num_items(user)
-        result = self.schema.dump(user, many=many)
-        return result.data
+        if user is not None:
+            many = self.if_many(user)
+            user = self.get_currect_num_items(user)
+            result = self.schema.dump(user, many=many)
+            return result.data
+        else:
+            return UserNotFound()
 
     def post(self):
         list = [
