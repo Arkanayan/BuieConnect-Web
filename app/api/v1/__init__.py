@@ -6,6 +6,7 @@ from .resources.noticelist import NoticeList
 from .resources.notice import Notice
 from .resources.UserAuth import UserAuth
 from .resources.UserManager import UserManager
+from .resources.RegistrationManager import RegistrationManager
 from app.exceptions import InvalidUsage
 
 
@@ -26,6 +27,8 @@ apiv1.add_resource(UserAuth, '/login', endpoint='login')
 # Add User resource to rest api
 apiv1.add_resource(UserManager, '/users/<int:id>', '/users', endpoint='user')
 
+# Add register url
+apiv1.add_resource(RegistrationManager, '/register', endpoint='register')
 
 # Register error handler
 @app.errorhandler(InvalidUsage)

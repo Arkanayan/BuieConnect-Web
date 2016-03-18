@@ -4,7 +4,7 @@ from marshmallow import pprint
 class InvalidUsage(Exception):
     status_code = 400
 
-    def __init__(self, message, status_code=None, errors=None):
+    def __init__(self, message, status_code=None, errors=[]):
         Exception.__init__(self)
         self.message = message
         if status_code is not None:
@@ -33,7 +33,7 @@ class UserNotFound(InvalidUsage):
 class UserCannotRegister(InvalidUsage):
     def __init__(self):
         self.message = "Sorry, couldn't register user"
-        self.status_code = 401
+        self.status_code = 400
         self.errors = []
 
 

@@ -118,3 +118,7 @@ class ErrorSchema(Schema):
     code = filds.Integer()
 
     errors = filds.Nested('ErrorSchema', many=True, exclude=['errors'], dump_only=True)
+
+class RegistraionDataSchema(Schema):
+
+    id_token = filds.String(required=True)
