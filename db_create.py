@@ -1,6 +1,6 @@
 # Database creation file
 from app import db
-from app.models import User, Role
+from app.models import User, Role, Notice
 
 # db.drop_all()
 db.create_all()

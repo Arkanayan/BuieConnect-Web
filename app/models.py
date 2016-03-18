@@ -79,6 +79,22 @@ class User(db.Model):
         return self.google_sub
 
 
+# Notice model
+class Notice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+    message = db.Column(db.String)
+    date_created = db.Column(db.DateTime, default=datetime.datetime.now())
+
+    author = db.relationship("User", backref=db.backref('notices', lazy="dynamic"))
+
+    def __init__(self, title, message=None, author=None):
+        self.title = title
+        self.message = message
+        self.author = author
+
+
+
 class Error:
     def __init__(self, message, code, errors=None):
         self.message = message
