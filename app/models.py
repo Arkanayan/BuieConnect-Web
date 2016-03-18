@@ -80,9 +80,10 @@ class User(db.Model):
 
 
 class Error:
-    def __init__(self, message, code):
+    def __init__(self, message, code, errors=None):
         self.message = message
         self.code = code
+        self.errors = errors
 
 
 

@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-
+from flask_marshmallow import pprint
 
 # Define articles resource api
 class NoticeList(Resource):
@@ -17,5 +17,19 @@ class NoticeList(Resource):
         self.reqparse.add_argument('title', type=str, required=True,
                                    help='No title provided', location='json')
         data = self.reqparse.parse_args()
-        return data['title']
+        req_data =[]
+        req_data.append(data)
+        pprint(req_data)
+        return req_data
+
+    def patch(self):
+        list = []
+        final_dict = { 'message' : 'this is the message'}
+        second_dict = { 'error': 'error1'}
+        third_dict = { 'error': 'error2'}
+        list.append(second_dict)
+        list.append(third_dict)
+        final_dict['errors'] = list
+        pprint(final_dict)
+        return final_dict
 
