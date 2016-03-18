@@ -21,18 +21,9 @@ def require_login(func):
             user = get_user_from_token(auth_token)
             #print(type(user))
             g.user = user
-        except UserNotFound:
-          info = get_info_from_google_id_token(auth_token)
-          pprint(info)
-          try:
-            #user = register_user(info)
-            #json = get_users_json(user, False)
-            #return jsonify, 201
-            pprint(info)
-            return jsonify(info)
-          except:
-            raise UserCannotRegister()
-        print(auth_token)
+        except:
+            raise UserNotFound()
+        #print(auth_token)
         # Otherwise just send them where they wanted to go
         return func(*args, **kwargs)
     return check_token
@@ -46,6 +37,7 @@ def get_token_from_header():
     if auth_token is None:
         raise ErrorNoToken()
     return auth_token
+
 
 def require_admin(func):
     from functools import wraps
@@ -104,6 +96,7 @@ def decode_token(token):
     except:
         return None
 
+
 # @app.route('/secret')
 # @require_api_token
 # def secret(token):
@@ -118,7 +111,7 @@ def get_info_from_google_id_token(id_token):
     """
     CLIENT_ID = app.config.get('CLIENT_ID')
     try:
-        idinfo = client._extract_id_token(id_token=id_token)
+        idinfo = client.verify_id_token(id_token, CLIENT_ID)
         if idinfo['aud'] not in [CLIENT_ID]:
             #raise crypt.AppIdentityError("Unrecognized client.")
             return False
@@ -139,7 +132,18 @@ def check_user_exists(google_sub):
     :return: user if exists else false
     """
     user = User.query.filter_by(google_sub=google_sub).first()
-    return user if not None else False
+    if user is None:
+        raise UserNotFound()
+    else:
+        return user
+
+def generate_token(data):
+    try:
+        token = jwt.encode(data, key=app.config.get('SECRET_KEY'))
+        return token
+    except:
+        raise InvalidUsage("Couldn't generate token. Retry")
+
 
 
 

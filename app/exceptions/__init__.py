@@ -42,3 +42,10 @@ class ErrorNoToken(InvalidUsage):
         self.message = "No token in header"
         self.status_code = 401
         self.errors = []
+
+
+class ErrorNoIdToken(InvalidUsage):
+    def __init__(self):
+        self.message = "No id token provided. Make sure you have signed in with google."
+        self.status_code = 401
+        self.errors = []

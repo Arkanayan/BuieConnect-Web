@@ -1,7 +1,7 @@
 from app.models import User
 from .fields import ErrorSchema,Error, UserSchema
 from app.models import User
-
+from flask import jsonify
 
 def get_error_json(message="There is an error.", code=400, additional_errors=[]):
     error_schema = ErrorSchema(many=False)
@@ -18,3 +18,11 @@ def get_users_json(users, many=False):
     user_schema = UserSchema()
     result = user_schema.dump(users, many=many)
     return result.data
+
+def get_token_json_output(token):
+    """
+    Get jonify token
+    :param token: auth token
+    :return: jsonified token
+    """
+    return jsonify({'auth_token': token})

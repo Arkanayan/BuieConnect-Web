@@ -1,11 +1,16 @@
 from flask_restful import Resource, reqparse
+from marshmallow import ValidationError
+
 from app import Auth
+from app.Auth import get_info_from_google_id_token, check_user_exists, generate_token
 from .fields import LoginSchema, ErrorSchema, Error
 from flask import request, g
 from flask_restful import marshal
 from flask_marshmallow import pprint
-from .utils import get_error_json, get_users_json
-from app.exceptions import UserNotFound
+from .utils import get_error_json, get_users_json, get_token_json_output
+from app.exceptions import UserNotFound, ErrorNoIdToken, InvalidUsage
+from .RegistrationManager import RegistrationManager
+
 
 class UserAuth(Resource):
     """ Handles users authentication, login etc."""
@@ -14,43 +19,24 @@ class UserAuth(Resource):
         self.reqparse = reqparse.RequestParser(bundle_errors=True)
         pass
 
-    @Auth.require_login
     def post(self):
         """
         Handles login function
+        which is get auth token
         :return: Auth token
         """
-        if g.user is None:
-            raise UserNotFound()
-        else:
-            return get_users_json(g.user, False)
+        try:
+            result = LoginSchema(strict=True).load(request.get_json())
+            pprint(result.data)
+        except ValidationError as err:
+            raise InvalidUsage("Please provide the id_token")
 
-
-            # self.reqparse.add_argument('id_token', type=str, required=True,
-            #                     help="No id_token provided", location='json')
-        # data = self.reqparse.parse_args()
-        # token = data['id_token']
-        # login_schema = LoginSchema(many=False)
-        # data = login_schema.load(request.json)
-        # if data.errors is not None:
-        #     pprint(data.errors)
-        #     #return get_error_json(message=data.errors['id_token'], code=401)
-        # token = data['id_token']
-        # info = Auth.get_info_from_google_id_token(token)
-        # if info is False:
-        #     error = {
-        #         Error("Invalid id_token", code=401),
-        #         Error("Invalid id_token", code=401)
-        #     }
-        #     error_schema = ErrorSchema()
-        #     data = error_schema.dump(error, many=len(error))
-        #     print(data)
-        #     return data.data
-        # google_sub = info['sub']
-        # user = Auth.check_user_exists(google_sub)
-        # if user is not None:
-        #     from flask import jsonify
-        #     return jsonify({"token" : user.get_auth_token()})
-        # user = Auth.register_user(info)
-        # from .fields import user_fields
-        # return marshal(user, user_fields)
+        data = result.data
+        id_token = data['id_token']
+        google_info = get_info_from_google_id_token(id_token=id_token)
+        try:
+            user = check_user_exists(google_info['sub'])
+            token = generate_token(get_users_json(user))
+            return get_token_json_output(token)
+        except:
+            raise UserNotFound
