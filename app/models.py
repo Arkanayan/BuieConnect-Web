@@ -3,6 +3,9 @@ from flask.ext.login import UserMixin
 from flask.ext.security import RoleMixin
 from flask import jsonify
 import jwt, datetime
+from pytz import timezone
+
+kolkata_time_zone = timezone('Asia/Kolkata')
 
 # Define relationship
 roles_users = db.Table('roles_users',
@@ -35,10 +38,16 @@ class User(db.Model):
     active = db.Column(db.Boolean, default=True)
     gcm_reg_id = db.Column(db.String, nullable=True)
     is_alumnus = db.Column(db.Boolean, default=False)
-    reg_date = db.Column(db.DateTime, default=datetime.datetime.now())
+    reg_date = db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
     #notices = db.relationship('Notice', backref=db.backref('author', lazy='dynamic'))
+    # Academic attributes
+    admission_year = db.Column(db.SmallInteger)
+    current_semester = db.Column(db.SmallInteger)
+    passout_year = db.Column(db.SmallInteger)
+    dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
+    department = db.relationship('Dept', backref=db.backref('academics', lazy='dynamic'))
 
     def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id=None, roles=None):
         self.email = email
@@ -47,7 +56,7 @@ class User(db.Model):
         self.google_sub = google_sub
         self.gcm_reg_id = gcm_reg_id
         if roles is None:
-            roles = Role.query.get(1)
+            roles = Role.query.filter(Role.name == 'user').one()
         self.roles = [roles]
 
     def __repr__(self):
@@ -118,32 +127,6 @@ class Dept(db.Model):
 
     def __repr__(self):
         return "<Dept id: {}, name: {}".format(self.id, self.name)
-
-
-# Academic info model
-class Academic(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', backref=db.backref('academic', lazy="dynamic"))
-    admission_year = db.Column(db.SmallInteger)
-    current_semester = db.Column(db.SmallInteger)
-    passout_year = db.Column(db.SmallInteger)
-    dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
-    department = db.relationship('Dept', backref=db.backref('academics', lazy='dynamic'))
-
-    def __init__(self, user, admission_year, current_sem, passout_year, department):
-        self.user = user
-        self.admission_year = admission_year
-        self.current_semester = current_sem
-        self.passout_year = passout_year
-        self.department = department
-
-
-class Error:
-    def __init__(self, message, code, errors=None):
-        self.message = message
-        self.code = code
-        self.errors = errors
 
 
 
