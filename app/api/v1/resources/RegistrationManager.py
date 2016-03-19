@@ -25,10 +25,11 @@ class RegistrationManager(Resource):
         google_info = get_info_from_google_id_token(id_token=id_token)
         try:
             user = check_user_exists(google_info['sub'])
-            token = generate_token(get_users_json(user))
+            token = user.get_auth_token()
             return get_token_json_output(token)
         except UserNotFound:
             user = register_user(google_info)
-            return get_users_json(user)
+            token = user.get_auth_token()
+            return get_token_json_output(token, first_time=True)
         except:
             raise UserCannotRegister

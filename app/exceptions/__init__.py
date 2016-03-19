@@ -49,3 +49,9 @@ class ErrorNoIdToken(InvalidUsage):
         self.message = "No id token provided. Make sure you have signed in with google."
         self.status_code = 401
         self.errors = []
+
+class NotAuthorized(InvalidUsage):
+    def __init__(self):
+        self.message = "You are not authorized to access this page"
+        self.status_code = 401
+        self.errors = []

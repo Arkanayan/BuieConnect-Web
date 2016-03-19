@@ -3,13 +3,14 @@ from app import app, db
 from app.models import User, Role
 from flask import jsonify, request, g
 import jwt
-from app.exceptions import UserNotFound, UserCannotRegister, ErrorNoToken, InvalidUsage
+from app.exceptions import UserNotFound, UserCannotRegister, ErrorNoToken, InvalidUsage, NotAuthorized
 from app.api.v1.resources.utils import get_users_json
 
 from flask_restful import Resource
 from marshmallow import pprint
 from oauth2client import client, crypt
 
+""" Decorators """
 
 def require_login(func):
     from functools import wraps
@@ -28,6 +29,26 @@ def require_login(func):
         return func(*args, **kwargs)
     return check_token
 
+
+""" Auth functions """
+def requre_self_or_admin(current_user, requested_user):
+    """
+    Check if request user is current user or admin
+    :param current_user: the user requesting
+    :param requested_user: the user rquested
+    :return: True if admin or current user else exception InvalidUsage
+    """
+    if "admin" in current_user.roles:
+        is_admin = True
+    else:
+        is_admin = False
+    if current_user is requested_user or is_admin:
+        return True
+    else:
+        raise NotAuthorized
+
+
+
 def get_token_from_header():
     """
     Gets the token from the header
@@ -37,6 +58,16 @@ def get_token_from_header():
     if auth_token is None:
         raise ErrorNoToken()
     return auth_token
+
+
+
+def get_user_from_header():
+    """
+    Gets user from the header
+    :return: user
+    """
+    token = get_token_from_header()
+    return get_user_from_token(token)
 
 
 def require_admin(func):

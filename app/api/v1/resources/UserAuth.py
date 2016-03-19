@@ -36,7 +36,7 @@ class UserAuth(Resource):
         google_info = get_info_from_google_id_token(id_token=id_token)
         try:
             user = check_user_exists(google_info['sub'])
-            token = generate_token(get_users_json(user))
+            token = user.get_auth_token()
             return get_token_json_output(token)
         except:
             raise UserNotFound

@@ -2,7 +2,7 @@ from flask_restful import Resource, reqparse, marshal_with, marshal
 from app.models import User, Error
 from .fields import user_fields
 from app import Auth
-from flask import abort
+from flask import abort, g
 from marshmallow import pprint
 from app.models import Error
 from .fields import UserSchema, ErrorSchema
@@ -58,14 +58,16 @@ class UserManager(Resource):
     def put(self, id=None):
         if id is None:
             return get_error_json("Please provide an user id", 400)
-        try:
-            user = Auth.get_user_from_id(id)
-            many = self.if_many(user)
-            user = self.get_currect_num_items(user)
-            result = self.schema.dump(user, many=many)
-            return result.data
-        except:
-            raise UserNotFound()
+
+        current_user = g.get('user', None)
+        requested_user = Auth.get_user_from_id(id)
+        if Auth.requre_self_or_admin(current_user, requested_user):
+            try:
+                #TODO update user here
+                result = self.schema.dump(requested_user)
+                return result.data
+            except:
+                raise UserNotFound()
 
     def post(self):
         list = [

@@ -19,10 +19,13 @@ def get_users_json(users, many=False):
     result = user_schema.dump(users, many=many)
     return result.data
 
-def get_token_json_output(token):
+
+def get_token_json_output(token, first_time=False):
     """
-    Get jonify token
+    Get jsonified token string for output
     :param token: auth token
-    :return: jsonified token
+    :param first_time if the user registerd this time
+    :return: jsonified token string
     """
-    return jsonify({'auth_token': token})
+    return jsonify({'auth_token': token,
+                    'first_time': first_time})
