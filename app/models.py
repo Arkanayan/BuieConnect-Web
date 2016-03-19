@@ -23,6 +23,9 @@ class Role(db.Model, RoleMixin):
         self.name = name
         self.description = description
 
+    def __repr__(self):
+        return "<Role name: {}, description: {}".format(self.name, self.description)
+
 
 # User model
 class User(db.Model):
@@ -47,7 +50,7 @@ class User(db.Model):
     current_semester = db.Column(db.SmallInteger)
     passout_year = db.Column(db.SmallInteger)
     dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
-    department = db.relationship('Dept', backref=db.backref('academics', lazy='dynamic'))
+    department = db.relationship('Dept', backref=db.backref('users', lazy='dynamic'))
 
     def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id=None, roles=None):
         self.email = email
