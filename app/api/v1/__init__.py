@@ -7,6 +7,7 @@ from .resources.notice import Notice
 from .resources.UserAuth import UserAuth
 from .resources.UserManager import UserManager
 from .resources.RegistrationManager import RegistrationManager
+from .resources.UserSelf import UserSelf
 from app.exceptions import InvalidUsage
 
 
@@ -29,6 +30,9 @@ apiv1.add_resource(UserManager, '/users/<int:id>', '/users', endpoint='user')
 
 # Add register url
 apiv1.add_resource(RegistrationManager, '/register', endpoint='register')
+
+# Add current user info url
+apiv1.add_resource(UserSelf, '/user', endpoint='selfuser')
 
 # Register error handler
 @app.errorhandler(InvalidUsage)
