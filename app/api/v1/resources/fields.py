@@ -150,6 +150,7 @@ class UserUpdateSchema(Schema):
         except:
             raise NotAuthorized
         user = User.query.get(data['id'])
+        del data['id']
         for key, value in data.items():
             if data[key] is not None and hasattr(user, key) and getattr(user, key) is not value:
                 setattr(user, key, data[key])

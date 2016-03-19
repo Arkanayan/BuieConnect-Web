@@ -38,7 +38,7 @@ class User(db.Model):
     lastName = db.Column(db.String(255), default='')
     univ_roll = db.Column(db.Integer, nullable=True)
     google_sub = db.Column(db.String, unique=True)
-    active = db.Column(db.Boolean, default=True)
+    active = db.Column(db.Boolean, default=False)
     gcm_reg_id = db.Column(db.String, nullable=True)
     is_alumnus = db.Column(db.Boolean, default=False)
     reg_date = db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now())
