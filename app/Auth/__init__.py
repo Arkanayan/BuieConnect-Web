@@ -48,6 +48,14 @@ def require_admin(func):
 
 
 """ Auth functions """
+
+
+def check_if_admin(user):
+    if "admin" in user.roles:
+        return True
+    else:
+        raise NotAuthorized
+
 def requre_self_or_admin(current_user, requested_user):
     """
     Check if request user is current user or admin

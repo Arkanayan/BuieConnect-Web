@@ -26,25 +26,29 @@ class UserManager(Resource):
         # When url is /users
         # returns the list of users
         current_user = g.get('user', None)
-        requested_user = Auth.get_user_from_id(id)
-        if not Auth.requre_self_or_admin(current_user, requested_user):
-            raise NotAuthorized
-        if id is None:
-            try:
-                users = User.query.limit(5).all()
-            except:
-                get_error_json("Users not found", 404)
-            # result = self.schema.dump(users, many=many)
-            #pprint(result.data)
-            return get_users_json(users, many=True)
-        # when url is /users/<id>
-        # returns the particular user at <id>
         if id is not None:
-
+            requested_user = Auth.get_user_from_id(id)
+            if not Auth.requre_self_or_admin(current_user, requested_user):
+                raise NotAuthorized
             user = User.query.filter(User.id == id).first()
             if user is None:
                 raise UserNotFound()
             return get_users_json(user, False)
+
+        if Auth.check_if_admin(current_user):
+            if id is None:
+                try:
+                    users = User.query.limit(5).all()
+                except:
+                    get_error_json("Users not found", 404)
+                # result = self.schema.dump(users, many=many)
+                #pprint(result.data)
+                return get_users_json(users, many=True)
+
+
+        # when url is /users/<id>
+        # returns the particular user at <id>
+
             # except:
             #     #return get_error_json("User not found", 404)
             #     #raise InvalidUsage("User not found", status_code=404)
