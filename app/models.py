@@ -23,6 +23,9 @@ class Role(db.Model, RoleMixin):
 
 # User model
 class User(db.Model):
+    """
+    User model
+    """
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
     firstName = db.Column(db.String(255), default='')
@@ -31,7 +34,7 @@ class User(db.Model):
     google_sub = db.Column(db.String, unique=True)
     active = db.Column(db.Boolean, default=True)
     gcm_reg_id = db.Column(db.String, nullable=True)
-    is_alumnus = db.Column(db.String, default=False)
+    is_alumnus = db.Column(db.Boolean, default=False)
     reg_date = db.Column(db.DateTime, default=datetime.datetime.now())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
@@ -46,6 +49,10 @@ class User(db.Model):
         if roles is None:
             roles = Role.query.get(1)
         self.roles = [roles]
+
+    def __repr__(self):
+        return "<User fName: {}, lName: {}, email: {}, isAdmin: {} >".format(self.firstName, self.lastName, self.email,
+                                                                             self.is_admin())
 
     def get_auth_token(self):
         """Generates user token
@@ -62,7 +69,7 @@ class User(db.Model):
     # check if the user is admin or not
     def is_admin(self):
         admin_role = Role.query.filter_by(name='admin').first()
-        return self.has_role(admin_role)
+        return admin_role in self.roles
 
     def is_authenticated(self):
         return True
@@ -82,6 +89,9 @@ class User(db.Model):
 
 # Notice model
 class Notice(db.Model):
+    """
+    Notice model
+    """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     message = db.Column(db.String)
@@ -94,6 +104,9 @@ class Notice(db.Model):
         self.message = message
         self.author = author
 
+    def __repr__(self):
+        return "<Notice title: {}, author: {}, date_created: {} >".format(self.title, self.author.name, self.date_created)
+
 
 # Department model
 class Dept(db.Model):
@@ -102,6 +115,9 @@ class Dept(db.Model):
 
     def __init__(self, name):
         self.name = name
+
+    def __repr__(self):
+        return "<Dept id: {}, name: {}".format(self.id, self.name)
 
 
 # Academic info model
