@@ -35,15 +35,13 @@ def require_admin(func):
     @wraps(func)
     def check_admin(*args, **kwargs):
         auth_token = get_token_from_header()
-        if auth_token is None:
-            return 'Access-denied', 401
         user = get_user_from_token(auth_token)
         if user is None:
-            return 'Invalid token', 401
+            raise UserNotFound
         if 'admin' in user.roles:
             return func(*args, **kwargs)
         else:
-            return 'Access-denied', 401
+            raise NotAuthorized
     return check_admin
 
 

@@ -35,7 +35,7 @@ class UserManager(Resource):
                 raise UserNotFound()
             return get_users_json(user, False)
 
-        if Auth.check_if_admin(current_user):
+        if current_user.is_admin():
             if id is None:
                 try:
                     users = User.query.limit(5).all()
@@ -44,6 +44,8 @@ class UserManager(Resource):
                 # result = self.schema.dump(users, many=many)
                 #pprint(result.data)
                 return get_users_json(users, many=True)
+        else:
+            raise NotAuthorized
 
 
         # when url is /users/<id>
