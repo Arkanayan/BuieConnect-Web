@@ -128,7 +128,11 @@ class Dept(db.Model):
     def __repr__(self):
         return "<Dept id: {}, name: {}".format(self.id, self.name)
 
-
-
+# Error model
+class Error:
+    def __init__(self, message, code, errors=None):
+        self.message = message
+        self.code = code
+        self.errors = errors
 
 
