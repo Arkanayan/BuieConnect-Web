@@ -3,7 +3,7 @@ from app import app, db
 from app.models import User, Role
 from flask import jsonify, request, g
 import jwt
-from app.exceptions import UserNotFound, UserCannotRegister, ErrorNoToken, InvalidUsage, NotAuthorized
+from app.exceptions import UserNotFound, UserCannotRegister, ErrorNoToken, InvalidUsage, NotAuthorized, InvalidToken
 from app.api.v1.resources.utils import get_users_json
 
 from flask_restful import Resource
@@ -23,11 +23,28 @@ def require_login(func):
             #print(type(user))
             g.user = user
         except:
-            raise UserNotFound()
+            raise InvalidToken
         #print(auth_token)
         # Otherwise just send them where they wanted to go
         return func(*args, **kwargs)
     return check_token
+
+
+def require_admin(func):
+    from functools import wraps
+    @wraps(func)
+    def check_admin(*args, **kwargs):
+        auth_token = get_token_from_header()
+        if auth_token is None:
+            return 'Access-denied', 401
+        user = get_user_from_token(auth_token)
+        if user is None:
+            return 'Invalid token', 401
+        if 'admin' in user.roles:
+            return func(*args, **kwargs)
+        else:
+            return 'Access-denied', 401
+    return check_admin
 
 
 """ Auth functions """
@@ -68,23 +85,6 @@ def get_user_from_header():
     """
     token = get_token_from_header()
     return get_user_from_token(token)
-
-
-def require_admin(func):
-    from functools import wraps
-    @wraps(func)
-    def check_admin(*args, **kwargs):
-        auth_token = request.headers.get('Authorization')
-        if auth_token is None:
-            return 'Access-denied', 401
-        user = get_user_from_token(auth_token)
-        if user is None:
-            return 'Invalid token', 401
-        if 'admin' in user.roles:
-            return func(*args, **kwargs)
-        else:
-            return 'Access-denied', 401
-    return check_admin
 
 
 def get_user_from_token(token):

@@ -16,7 +16,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEBUG = True
     DATABASE_URI = "postgresql://testuser:password@localhost:5432/buieConnect"
-    SQLALCHEMY_DATABASE_URI = DATABASE_URI
+    SQLALCHEMY_DATABASE_URI = Config.DATABASE_URI
     SQLALCHEMY_ECHO = True
 
 

@@ -1,13 +1,13 @@
 from flask_restful import Resource, reqparse, marshal_with, marshal
 from app.models import User, Error
-from .fields import user_fields
-from app import Auth
-from flask import abort, g
+from .fields import user_fields, UserUpdateSchema
+from app import Auth, db
+from flask import abort, g, request
 from marshmallow import pprint
 from app.models import Error
 from .fields import UserSchema, ErrorSchema
 from .utils import get_error_json, get_users_json
-from app.exceptions import UserNotFound, InvalidUsage
+from app.exceptions import UserNotFound, InvalidUsage, NotAuthorized
 
 class UserManager(Resource):
     """
@@ -21,10 +21,14 @@ class UserManager(Resource):
         return many
 
 
-    #@marshal_with(user_fields)
+    @Auth.require_login
     def get(self, id=None):
         # When url is /users
         # returns the list of users
+        current_user = g.get('user', None)
+        requested_user = Auth.get_user_from_id(id)
+        if not Auth.requre_self_or_admin(current_user, requested_user):
+            raise NotAuthorized
         if id is None:
             try:
                 users = User.query.limit(5).all()
@@ -47,6 +51,7 @@ class UserManager(Resource):
             #     errors = {'error1': 'message here', 'error2': 'message error 2'}
             #     raise UserNotFound(errors=[errors, {'2': 'message2'}])
 
+
     def get_currect_num_items(self, items):
         if len(items) >= 1:
             user = items[0]
@@ -63,11 +68,15 @@ class UserManager(Resource):
         requested_user = Auth.get_user_from_id(id)
         if Auth.requre_self_or_admin(current_user, requested_user):
             try:
-                #TODO update user here
-                result = self.schema.dump(requested_user)
-                return result.data
+                user_update_schema = UserUpdateSchema(partial=True, strict=True)
+                result = user_update_schema.load(request.json)
+                db.session.add(result.data)
+                db.session.commit()
+                return get_users_json(result.data)
+            except NotAuthorized:
+                raise NotAuthorized
             except:
-                raise UserNotFound()
+                raise InvalidUsage("Please check the data", 400)
 
     def post(self):
         list = [

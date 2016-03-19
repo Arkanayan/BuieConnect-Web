@@ -29,3 +29,5 @@ def get_token_json_output(token, first_time=False):
     """
     return jsonify({'auth_token': token,
                     'first_time': first_time})
+
+

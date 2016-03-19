@@ -1,6 +1,15 @@
-from app import app
+from app import app, db
 
+from flask import json, request, jsonify
+from .api.v1.resources.fields import UserUpdateSchema
+from .api.v1.resources.utils import get_users_json
 
-@app.route('/')
+@app.route('/', methods=['POST'])
 def index():
-    return "hello world"
+    # json_string = json.load(request.json)
+    user_update_schema = UserUpdateSchema(partial=True)
+    result = user_update_schema.load(request.json)
+    db.session.add(result.data)
+    db.session.commit()
+    return jsonify({'roll': result.data.univ_roll})
+

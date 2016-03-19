@@ -52,6 +52,13 @@ class ErrorNoIdToken(InvalidUsage):
 
 class NotAuthorized(InvalidUsage):
     def __init__(self):
-        self.message = "You are not authorized to access this page"
+        self.message = "You are not authorized to access this resource"
+        self.status_code = 403
+        self.errors = []
+
+class InvalidToken(InvalidUsage):
+    def __init__(self):
+        self.message = "Your auth token is invalid"
         self.status_code = 401
         self.errors = []
+
