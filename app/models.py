@@ -49,8 +49,7 @@ class User(db.Model):
     admission_year = db.Column(db.SmallInteger)
     current_semester = db.Column(db.SmallInteger)
     passout_year = db.Column(db.SmallInteger)
-    dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
-    department = db.relationship('Dept', backref=db.backref('users', lazy='dynamic'))
+    department_name = db.Column(db.String)
 
     def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id=None, roles=None):
         self.email = email
@@ -121,15 +120,15 @@ class Notice(db.Model):
 
 
 # Department model
-class Dept(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return "<Dept id: {}, name: {}".format(self.id, self.name)
+# class Dept(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(100))
+#
+#     def __init__(self, name):
+#         self.name = name
+#
+#     def __repr__(self):
+#         return "<Dept id: {}, name: {}".format(self.id, self.name)
 
 # Error model
 class Error:
