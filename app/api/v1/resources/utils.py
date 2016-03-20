@@ -1,6 +1,4 @@
-from app.models import User
-from .fields import ErrorSchema,Error, UserSchema
-from app.models import User
+from .fields import ErrorSchema, Error, UserSchema
 from flask import jsonify
 
 def get_error_json(message="There is an error.", code=400, additional_errors=[]):
@@ -30,4 +28,12 @@ def get_token_json_output(token, first_time=False):
     return jsonify({'auth_token': token,
                     'first_time': first_time})
 
+def get_random_hash():
+    """
+    Generates random hash
+    :return: hash
+    """
+    import random
+    hash = random.getrandbits(128)
+    return hash
 

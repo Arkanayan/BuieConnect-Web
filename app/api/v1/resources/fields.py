@@ -93,7 +93,7 @@ class UserSchema(marsh.ModelSchema):
 
     class Meta(BaseSchema.Meta):
         model = User
-        exclude = ("notices", "roles", "department")
+        exclude = ("notices", "roles", "department", "token_hash")
 
     roles = filds.Nested(RoleSchema, many=True, exclude=('id', 'description', 'users',))
     dept_name = filds.Method("department_name")
@@ -137,7 +137,7 @@ class UserUpdateSchema(Schema):
     is_alumnus = filds.Boolean(required=False, allow_none=True)
     univ_roll = filds.Integer(required=False, allow_none=True)
     admission_year = filds.Integer(required=False, allow_none=True)
-    dept_name = filds.String(required=False, allow_none=True)
+    department_name = filds.String(required=False, allow_none=True)
     gcm_reg_id = filds.String(required=False, allow_none=True)
 
     @post_load

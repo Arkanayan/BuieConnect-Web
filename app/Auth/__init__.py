@@ -182,16 +182,6 @@ def generate_token(data):
         raise InvalidUsage("Couldn't generate token. Retry")
 
 
-def get_random_hash():
-    """
-    Generates random hash
-    :return: hash
-    """
-    import random
-    hash = random.getrandbits(128)
-    return hash
-
-
 def register_user(google_info):
     """
     Register user from the info from google

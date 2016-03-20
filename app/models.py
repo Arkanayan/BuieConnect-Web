@@ -5,6 +5,17 @@ from flask import jsonify
 import jwt, datetime
 from pytz import timezone
 
+
+
+def get_random_hash():
+    """
+    Generates random hash
+    :return: hash
+    """
+    import random
+    hash = random.getrandbits(128)
+    return hash
+
 kolkata_time_zone = timezone('Asia/Kolkata')
 
 # Define relationship
@@ -62,7 +73,7 @@ class User(db.Model):
         if roles is None:
             roles = Role.query.filter(Role.name == 'user').one()
         self.roles = [roles]
-        self.token_hash = app.Auth.get_random_hash()
+        self.token_hash = get_random_hash()
 
     def __repr__(self):
         return "<User fName: {}, lName: {}, email: {}, isAdmin: {} >".format(self.firstName, self.lastName, self.email,
@@ -85,7 +96,7 @@ class User(db.Model):
         Resets the token hash
         :return:
         """
-        self.token_hash = app.Auth.get_random_hash()
+        self.token_hash = get_random_hash()
         db.session.add(self)
         db.session.commit()
 
