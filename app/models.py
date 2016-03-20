@@ -47,7 +47,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True)
     firstName = db.Column(db.String(255), default='')
     lastName = db.Column(db.String(255), default='')
-    univ_roll = db.Column(db.Integer, nullable=True)
+    univ_roll = db.Column(db.BigInteger, nullable=True)
     google_sub = db.Column(db.String, unique=True, index=True)
     verified = db.Column(db.Boolean, default=False)
     gcm_reg_id = db.Column(db.String, nullable=True)

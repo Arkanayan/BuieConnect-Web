@@ -135,7 +135,7 @@ class UserUpdateSchema(Schema):
     passout_year = filds.Int(required=False, allow_none=True)
     current_semester = filds.Integer(required=False, allow_none=True)
     is_alumnus = filds.Boolean(required=False, allow_none=True)
-    univ_roll = filds.Integer(required=False, allow_none=True)
+    univ_roll = filds.Integer(required=False, allow_none=True, as_string=True)
     admission_year = filds.Integer(required=False, allow_none=True)
     department_name = filds.String(required=False, allow_none=True)
     gcm_reg_id = filds.String(required=False, allow_none=True)
@@ -152,7 +152,7 @@ class UserUpdateSchema(Schema):
         user = User.query.get(data['id'])
         del data['id']
         for key, value in data.items():
-            if data[key] is not None and hasattr(user, key) and getattr(user, key) is not value:
+            if value is not None and hasattr(user, key) and getattr(user, key) != value:
                 setattr(user, key, data[key])
         return user
 
