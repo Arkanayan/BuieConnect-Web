@@ -15,11 +15,14 @@ class Config(object):
 # config for testing purposes
 class DevelopmentConfig(Config):
     DEBUG = True
-    DATABASE_URI = "postgresql://testuser:password@localhost:5432/buieConnect"
-    SQLALCHEMY_DATABASE_URI = Config.DATABASE_URI
+    DATABASE_URI = "postgresql://testuser:password@localhost:5432/buieconnect"
+    SQLALCHEMY_DATABASE_URI = DATABASE_URI
     SQLALCHEMY_ECHO = True
 
 
 # Config for used on production
 class ProductionConfig(Config):
     TESTING = True
+    DATABASE_URI = os.getenv("DATABASE_URI", None)
+    SQLALCHEMY_DATABASE_URI = DATABASE_URI
+    SQLALCHEMY_ECHO = False

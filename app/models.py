@@ -37,8 +37,8 @@ class User(db.Model):
     firstName = db.Column(db.String(255), default='')
     lastName = db.Column(db.String(255), default='')
     univ_roll = db.Column(db.Integer, nullable=True)
-    google_sub = db.Column(db.String, unique=True)
-    active = db.Column(db.Boolean, default=False)
+    google_sub = db.Column(db.String, unique=True, index=True)
+    verified = db.Column(db.Boolean, default=False)
     gcm_reg_id = db.Column(db.String, nullable=True)
     is_alumnus = db.Column(db.Boolean, default=False)
     reg_date = db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now())
@@ -50,6 +50,8 @@ class User(db.Model):
     current_semester = db.Column(db.SmallInteger)
     passout_year = db.Column(db.SmallInteger)
     department_name = db.Column(db.String)
+    # token related attributes
+    token_hash = db.Column(db.String)
 
     def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id=None, roles=None):
         self.email = email
@@ -60,6 +62,7 @@ class User(db.Model):
         if roles is None:
             roles = Role.query.filter(Role.name == 'user').one()
         self.roles = [roles]
+        self.token_hash = app.Auth.get_random_hash()
 
     def __repr__(self):
         return "<User fName: {}, lName: {}, email: {}, isAdmin: {} >".format(self.firstName, self.lastName, self.email,
@@ -72,21 +75,66 @@ class User(db.Model):
         struct = {
             "id": self.id,
             "google_sub": self.google_sub,
-            "email": self.email
+            "token_hash": self.token_hash
         }
         token = jwt.encode(struct, key=app.config.get('SECRET_KEY'))
         return token
 
+    def reset_token_hash(self):
+        """
+        Resets the token hash
+        :return:
+        """
+        self.token_hash = app.Auth.get_random_hash()
+        db.session.add(self)
+        db.session.commit()
+
     # check if the user is admin or not
     def is_admin(self):
-        admin_role = Role.query.filter_by(name='admin').first()
+        """
+        Check if the user is admin or not
+        :return: true if admin else false
+        """
+        admin_role = Role.query.filter(Role.name.like("%admin%")).first()
         return admin_role in self.roles
 
-    def is_authenticated(self):
-        return True
+    def is_superadmin(self):
+        """
+        Check if the user is super admin or not
+        :return: true if super admin else false
+        """
+        superadmin_role = Role.query.filter(Role.name.like("%superadmin%")).first()
+        return superadmin_role in self.roles
 
-    def is_active(self):
-        return self.active
+    def add_role(self, role):
+        """
+        Add role to current user
+        :param role: role to add
+        :return: true if succeed else false
+        """
+        try:
+            self.roles.append(role)
+            db.session.add(self)
+            db.session.commit()
+            return True
+        except:
+            return False
+
+    def set_verified(self, status):
+        """
+        Verify user
+        :return: true if verify succeed else false
+        """
+        try:
+            self.verified = True
+            db.session.add(self)
+            db.session.commit()
+            return True
+        except:
+            return False
+
+    def is_verified(self):
+        return self.verified
 
     def is_anonymous(self):
         return False

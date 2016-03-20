@@ -1,6 +1,5 @@
 from flask_restful import Resource, reqparse
 from marshmallow import ValidationError
-
 from app import Auth
 from app.Auth import get_info_from_google_id_token, check_user_exists, generate_token
 from .fields import LoginSchema, ErrorSchema, Error
@@ -26,10 +25,15 @@ class UserAuth(Resource):
         :return: Auth token
         """
         try:
-            result = LoginSchema(strict=True).load(request.get_json())
-            pprint(result.data)
+            login_schema = LoginSchema(strict=True)
+            result = login_schema.load(request.get_json())
+            if len(result.data) < 1:
+                raise InvalidUsage("Please provide the id_token")
         except ValidationError as err:
             raise InvalidUsage("Please provide the id_token")
+        except:
+            raise InvalidUsage("Please provide the id_token")
+
 
         data = result.data
         id_token = data['id_token']

@@ -16,7 +16,7 @@ user_fields = {
     'lastName': fields.String,
     'univ_roll': fields.Integer,
     'google_sub': fields.String,
-    'active': fields.Boolean,
+    'verified': fields.Boolean,
     'gcm_reg_id': fields.String,
     'is_alumnus': fields.Boolean,
     'reg_date': fields.DateTime,
@@ -106,7 +106,7 @@ class UserSchema(marsh.ModelSchema):
         #     return url_for('apiv1.user', id=obj.id, _external=True)
 
 
-class LoginSchema(marsh.Schema):
+class LoginSchema(Schema):
     login_error_messages = {
         'required': 'Error: id_token is required for login',
     }
@@ -155,3 +155,11 @@ class UserUpdateSchema(Schema):
             if data[key] is not None and hasattr(user, key) and getattr(user, key) is not value:
                 setattr(user, key, data[key])
         return user
+
+class TokenDataSchema(Schema):
+    """
+    This schema fields is used to generate tokens
+    """
+    id = filds.Integer()
+    google_sub = filds.String()
+    token_hash = filds.String()
