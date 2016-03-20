@@ -21,15 +21,13 @@ class UserManager(Resource):
         return many
 
 
-    @Auth.require_login
+    #@Auth.require_login
+    @Auth.require_me_or_admin
     def get(self, id=None):
-        # When url is /users
+        # When url is "/users"
         # returns the list of users
         current_user = g.get('user', None)
         if id is not None:
-            requested_user = Auth.get_user_from_id(id)
-            if not Auth.requre_self_or_admin(current_user, requested_user):
-                raise NotAuthorized
             user = User.query.filter(User.id == id).first()
             if user is None:
                 raise UserNotFound()

@@ -28,12 +28,11 @@ class UserAuth(Resource):
             login_schema = LoginSchema(strict=True)
             result = login_schema.load(request.get_json())
             if len(result.data) < 1:
-                raise InvalidUsage("Please provide the id_token")
-        except ValidationError as err:
-            raise InvalidUsage("Please provide the id_token")
+                raise ErrorNoIdToken
+        except ValidationError:
+            raise ErrorNoIdToken
         except:
-            raise InvalidUsage("Please provide the id_token")
-
+            raise ErrorNoIdToken
 
         data = result.data
         id_token = data['id_token']

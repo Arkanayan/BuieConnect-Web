@@ -15,7 +15,7 @@ class Config(object):
 # config for testing purposes
 class DevelopmentConfig(Config):
     DEBUG = True
-    DATABASE_URI = "postgresql://testuser:password@localhost:5432/buieconnect"
+    DATABASE_URI = "postgresql://testuser:password@127.0.0.1:5432/buieconnect"
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
     SQLALCHEMY_ECHO = True
 

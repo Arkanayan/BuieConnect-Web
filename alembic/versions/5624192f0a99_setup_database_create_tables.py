@@ -33,7 +33,7 @@ def upgrade():
     sa.Column('email', sa.String(length=255), nullable=True),
     sa.Column('firstName', sa.String(length=255), nullable=True),
     sa.Column('lastName', sa.String(length=255), nullable=True),
-    sa.Column('univ_roll', sa.Integer(), nullable=True),
+    sa.Column('univ_roll', sa.BigInteger(), nullable=True),
     sa.Column('google_sub', sa.String(), nullable=True),
     sa.Column('verified', sa.Boolean(), nullable=True),
     sa.Column('gcm_reg_id', sa.String(), nullable=True),
@@ -63,6 +63,7 @@ def upgrade():
     sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], )
     )
+
     ### end Alembic commands ###
 
 

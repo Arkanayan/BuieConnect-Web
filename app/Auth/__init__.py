@@ -44,6 +44,20 @@ def require_admin(func):
             raise NotAuthorized
     return check_admin
 
+def require_me_or_admin(func):
+    from functools import wraps
+    @wraps(func)
+    def check_admin(*args, **kwargs):
+        auth_token = get_token_from_header()
+        user = get_user_from_token(auth_token)
+        if user is None:
+            raise NotAuthorized
+        if user.is_admin() or kwargs.get('id', None) == user.id:
+            return func(*args, **kwargs)
+        else:
+            raise NotAuthorized
+    return check_admin
+
 
 """ Auth functions """
 

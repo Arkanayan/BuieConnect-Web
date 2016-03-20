@@ -23,5 +23,7 @@ class UserSelf(Resource):
             db.session.add(result.data)
             db.session.commit()
             return get_users_json(result.data)
+        except NotAuthorized:
+            raise NotAuthorized
         except:
-            raise InvalidUsage("Please check the data", 400)
+            raise InvalidUsage("Please check the data", 400, result.errors)

@@ -134,10 +134,11 @@ class User(db.Model):
     def set_verified(self, status):
         """
         Verify user
+        :param status: status which the user will be changed to
         :return: true if verify succeed else false
         """
         try:
-            self.verified = True
+            self.verified = status
             db.session.add(self)
             db.session.commit()
             return True
