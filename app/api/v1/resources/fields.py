@@ -96,14 +96,17 @@ class UserSchema(marsh.ModelSchema):
         exclude = ("notices", "roles", "department", "token_hash")
 
     roles = filds.Nested(RoleSchema, many=True, exclude=('id', 'description', 'users',))
-    dept_name = filds.Method("department_name")
+    # dept_name = filds.Method("department_name")
     # url = filds.Method('user_url')
     url = marsh.URLFor('apiv1.user', id='<id>', _external=True)
+    is_admin = filds.Method('is_user_admin')
 
-    def department_name(self, obj):
-        return obj.department.name if obj.department is not None else None
-        # def user_url(self, obj):
-        #     return url_for('apiv1.user', id=obj.id, _external=True)
+    def is_user_admin(self, obj):
+        return obj.is_admin()
+    # def department_name(self, obj):
+    #     return obj.department.name if obj.department is not None else None
+    #     # def user_url(self, obj):
+    #     #     return url_for('apiv1.user', id=obj.id, _external=True)
 
 
 class LoginSchema(Schema):

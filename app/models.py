@@ -28,14 +28,14 @@ roles_users = db.Table('roles_users',
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255), nullable=True)
+    description = db.deferred(db.Column(db.String(255), nullable=True))
 
     def __init__(self, name, description=None):
         self.name = name
         self.description = description
 
     def __repr__(self):
-        return "<Role name: {}, description: {}".format(self.name, self.description)
+        return "<Role name: {}, description: {} >".format(self.name, self.description)
 
 
 # User model
@@ -47,22 +47,22 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True)
     firstName = db.Column(db.String(255), default='')
     lastName = db.Column(db.String(255), default='')
-    univ_roll = db.Column(db.BigInteger, nullable=True)
     google_sub = db.Column(db.String, unique=True, index=True)
     verified = db.Column(db.Boolean, default=False)
-    gcm_reg_id = db.Column(db.String, nullable=True)
-    is_alumnus = db.Column(db.Boolean, default=False)
-    reg_date = db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now())
+    gcm_reg_id = db.deferred(db.Column(db.String, nullable=True))
+    reg_date = db.deferred(db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now()))
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
     #notices = db.relationship('Notice', backref=db.backref('author', lazy='dynamic'))
     # Academic attributes
-    admission_year = db.Column(db.SmallInteger)
-    current_semester = db.Column(db.SmallInteger)
-    passout_year = db.Column(db.SmallInteger)
-    department_name = db.Column(db.String)
+    is_alumnus = db.deferred(db.Column(db.Boolean, default=False), group='academic')
+    univ_roll = db.deferred(db.Column(db.BigInteger, nullable=True), group='academic')
+    admission_year = db.deferred(db.Column(db.SmallInteger), group='academic')
+    current_semester = db.deferred(db.Column(db.SmallInteger), group='academic')
+    passout_year = db.deferred(db.Column(db.SmallInteger), group='academic')
+    department_name = db.deferred(db.Column(db.String))
     # token related attributes
-    token_hash = db.Column(db.String)
+    token_hash = db.deferred(db.Column(db.String))
 
     def __init__(self, email, firstName, lastName, google_sub, gcm_reg_id=None, roles=None):
         self.email = email
@@ -134,13 +134,12 @@ class User(db.Model):
     def set_verified(self, status):
         """
         Verify user
+        commit to database after setting verification status
         :param status: status which the user will be changed to
         :return: true if verify succeed else false
         """
         try:
             self.verified = status
-            db.session.add(self)
-            db.session.commit()
             return True
         except:
             return False
@@ -165,7 +164,7 @@ class Notice(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
-    message = db.Column(db.String)
+    message = db.deferred(db.Column(db.String))
     date_created = db.Column(db.DateTime, default=datetime.datetime.now())
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship("User", backref=db.backref('notices', lazy="dynamic"))
