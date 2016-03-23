@@ -173,3 +173,15 @@ class VerifyUserIds(Schema):
     e.g. id: [ 1, 3, 4]
     """
     id = filds.List(filds.Integer(required=True), required=True)
+
+class MessagePayload(Schema):
+
+    to = filds.List(filds.Integer())
+    to_all = filds.Boolean()
+    admission_year = filds.Integer()
+    passout_year = filds.Integer()
+    current_semester = filds.Integer()
+    department_name = filds.String()
+    is_alumnus = filds.Boolean()
+    title = filds.String(required=True)
+    message = filds.String()

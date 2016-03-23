@@ -11,6 +11,7 @@ class Config(object):
     #SECURITY_TRACKABLE = True
     SECURITY_PASSWORD_SALT = 'something_super_secret_change_in_production'
     CLIENT_ID = os.getenv("CLIENT_ID", None)
+    GCM_API_KEY = os.getenv("GCM_API_KEY", None)
 
 # config for testing purposes
 class DevelopmentConfig(Config):

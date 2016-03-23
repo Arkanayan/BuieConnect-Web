@@ -73,3 +73,9 @@ class InvalidInput(InvalidUsage):
         self.message = "Invalid input. Please check the input"
         self.status_code = 400
         self.errors = []
+
+class CouldNotSendMessage(InvalidUsage):
+    def __init__(self):
+        self.message = "Sorry, Message couldn't be sent"
+        self.status_code = 500
+        self.errors = []

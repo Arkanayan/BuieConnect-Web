@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify
 from flask_restful import Api
 
 from app import app
+from app.api.v1.resources.admin_urls.MessageHandler import MessageHandler
 from app.api.v1.resources.admin_urls.Verify import Verify
 from app.exceptions import InvalidUsage
 from .resources.RegistrationManager import RegistrationManager
@@ -35,8 +36,11 @@ apiv1.add_resource(RegistrationManager, '/register', endpoint='register')
 # Add current user info url
 apiv1.add_resource(UserSelf, '/user', endpoint='selfuser')
 
-# Add admin api
-apiv1.add_resource(Verify, '/admin/verify', endpoint='admin')
+# Add admin verification api
+apiv1.add_resource(Verify, '/admin/verified', endpoint='admin')
+
+#Add message sending admin api
+apiv1.add_resource(MessageHandler, '/admin/send', endpoint='messagehandler')
 
 # Register error handler
 @app.errorhandler(InvalidUsage)

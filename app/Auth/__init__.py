@@ -57,7 +57,8 @@ def require_roles(*roles):
             g.user = user
             if user is None:
                 raise UserNotFound
-            if set(roles) == set([rol.name for rol in user.roles]):
+            #if set(roles) == set([rol.name for rol in user.roles]):
+            if (set([rol.name for rol in user.roles]) & set(roles)) == set(roles):
                 return func(*args, **kwargs)
             else:
                 raise NotAuthorized

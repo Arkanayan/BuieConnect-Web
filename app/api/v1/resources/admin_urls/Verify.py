@@ -6,9 +6,12 @@ from app.api.v1.resources.fields import VerifyUserIds
 from app.api.v1.resources.utils import get_users_json
 from app.exceptions import OperationNotCompleted, InvalidInput
 from app.models import User
+from app import Auth
+
+
 class Verify(Resource):
 
-    #@Auth.require_roles("admin", "user")
+    @Auth.require_roles("admin")
     def get(self):
         """
         This method returns verified users json unless ?verified=false is specified
@@ -22,6 +25,8 @@ class Verify(Resource):
         verified_users = User.query.filter(User.verified == True).all()
         return get_users_json(verified_users, True)
 
+
+    @Auth.require_roles("admin")
     def post(self):
         verify_user_ids = VerifyUserIds(strict=True)
 
