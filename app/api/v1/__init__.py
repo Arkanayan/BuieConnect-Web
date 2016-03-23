@@ -1,15 +1,16 @@
 # Import main Flask app instance, Blueprint, flask_restful
 from flask import Blueprint, jsonify
+from flask_restful import Api
+
 from app import app
-from flask_restful import Resource, Api
-from .resources.noticelist import NoticeList
-from .resources.notice import Notice
+from app.api.v1.resources.admin_urls.Verify import Verify
+from app.exceptions import InvalidUsage
+from .resources.RegistrationManager import RegistrationManager
 from .resources.UserAuth import UserAuth
 from .resources.UserManager import UserManager
-from .resources.RegistrationManager import RegistrationManager
 from .resources.UserSelf import UserSelf
-from app.exceptions import InvalidUsage
-
+from .resources.notice import Notice
+from .resources.noticelist import NoticeList
 
 # Define Blueprint of api
 apiv1_bp = Blueprint('apiv1', __name__)
@@ -33,6 +34,9 @@ apiv1.add_resource(RegistrationManager, '/register', endpoint='register')
 
 # Add current user info url
 apiv1.add_resource(UserSelf, '/user', endpoint='selfuser')
+
+# Add admin api
+apiv1.add_resource(Verify, '/admin/verify', endpoint='admin')
 
 # Register error handler
 @app.errorhandler(InvalidUsage)

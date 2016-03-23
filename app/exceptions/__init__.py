@@ -62,3 +62,14 @@ class InvalidToken(InvalidUsage):
         self.status_code = 401
         self.errors = []
 
+class OperationNotCompleted(InvalidUsage):
+    def __init__(self):
+        self.message = "Sorry, operation couldn't be completed"
+        self.status_code = 400
+        self.errors = []
+
+class InvalidInput(InvalidUsage):
+    def __init__(self):
+        self.message = "Invalid input. Please check the input"
+        self.status_code = 400
+        self.errors = []

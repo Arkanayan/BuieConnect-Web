@@ -36,6 +36,7 @@ def require_admin(func):
     def check_admin(*args, **kwargs):
         auth_token = get_token_from_header()
         user = get_user_from_token(auth_token)
+        g.user = user
         if user is None:
             raise UserNotFound
         if 'admin' in user.roles:
@@ -44,12 +45,33 @@ def require_admin(func):
             raise NotAuthorized
     return check_admin
 
+
+def require_roles(*roles):
+    def real_require_roles(func):
+        from functools import wraps
+        @wraps(func)
+        def check_roles(*args, **kwargs):
+            auth_token = get_token_from_header()
+            user = get_user_from_token(auth_token)
+            print("email: ", user.email)
+            g.user = user
+            if user is None:
+                raise UserNotFound
+            if set(roles) == set([rol.name for rol in user.roles]):
+                return func(*args, **kwargs)
+            else:
+                raise NotAuthorized
+        return check_roles
+    return real_require_roles
+
+
 def require_me_or_admin(func):
     from functools import wraps
     @wraps(func)
     def check_admin(*args, **kwargs):
         auth_token = get_token_from_header()
         user = get_user_from_token(auth_token)
+        g.user = user
         if user is None:
             raise NotAuthorized
         if user.is_admin() or kwargs.get('id', None) == user.id:
@@ -119,7 +141,7 @@ def get_user_from_token(token):
         raise InvalidUsage("Invalid token")
     google_sub = user_string['google_sub']
     user = User.query.filter(User.google_sub == google_sub).first()
-    print("get_user_from_token: email: ", user.email)
+    # print("get_user_from_token: email: ", user.email)
     if user is not None:
         g.user = user
         return user

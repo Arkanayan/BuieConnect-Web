@@ -166,3 +166,10 @@ class TokenDataSchema(Schema):
     id = filds.Integer()
     google_sub = filds.String()
     token_hash = filds.String()
+
+class VerifyUserIds(Schema):
+    """
+    contains list of id's that needs to be verified
+    e.g. id: [ 1, 3, 4]
+    """
+    id = filds.List(filds.Integer(required=True), required=True)
