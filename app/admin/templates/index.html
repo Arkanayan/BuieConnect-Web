@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin page</title>
+    <!-- Google signin client id -->
+    <meta name="google-signin-client_id" content="{{ client_id}}">
+
+    <!--Import Google Icon Font-->
+      <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+{#      <link type="text/css" rel="stylesheet" href="/static/css/materialize.min.css"  media="screen,projection"/>#}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+
+  html {
+      font-family: 'Roboto', sans-serif;
+      margin:0;
+  }
+    #logOutButton {
+        margin-top: 10px;
+    }
+        #signInButton {
+            margin-left: 20%;
+        }
+        .loader {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+                        <div class="progress loader" style="margin-top: 0px;">
+                             <div class="indeterminate"></div>
+                         </div>
+    <div class="container">
+        <div class="row">
+                  <div class="col s12 m4 l3 ">
+                      <!-- Grey navigation panel -->
+                        <h5 class="center-align"></h5>
+                      <section class="center-align section card-panel">
+                      <div class="g-signin2" data-onsuccess="onSignIn" id="signInButton"></div>
+                      <a href="#" class="waves-effect waves-light btn light-blue accent-3 disabled" disabled id="logOutButton" onclick="signOut();">Sign out</a>
+{#                      <button class="waves-effect waves-light btn" data-bind="click: getUser">Get user</button>#}
+
+                      </section>
+                  </div>
+                <div class="col s12 m8 l9 card">
+                    <h5 class="center-align">Send Message</h5>
+                    <div class="divider"></div>
+                    <section class="section" data-bind="visible: !loggedIn()">
+                        <h4 class="center-align">Please Sign in to access this page.</h4>
+                    </section>
+                    <form  class="section" data-bind="visible: loggedIn, submit: sendNotice">
+                         <div class="input-field col s12">
+                                  <input type="text" id="noticeTitle" data-bind="textInput: noticeTitle" required>
+                                  <label for="noticeTitle">Title</label>
+                         </div>
+
+                          <div class="input-field col s12">
+                              <textarea id="noticeMessage" class="materialize-textarea" data-bind="textInput: noticeMessage"></textarea>
+                              <label for="noticeMessage">Message</label>
+                          </div>
+                        <button class="btn waves-effect waves-light light-blue accent-3 " type="submit" name="action">Send
+                           <i class="material-icons right">send</i>
+                         </button>
+
+
+
+                    </form>
+                </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+
+
+    <script>
+
+           var auth_token = localStorage.getItem("auth_token");
+
+        // jQuery settings
+        var jQSettings = {
+                "async": true,
+                "crossDomain": true,
+                "headers": {
+                    "content-type": "application/json",
+                    "cache-control": "no-cache"
+                },
+                "processData": false
+            };
+
+        // Sign In callback
+    function onSignIn(googleUser) {
+        // Disable SignIn button
+        $('#signInButton').attr("disabled");
+
+        var self = this;
+         var profile = googleUser.getBasicProfile();
+         var id_token = googleUser.getAuthResponse().id_token;
+
+         console.log(id_token);
+         console.log("Expires at " + googleUser.getAuthResponse().expires_at);
+
+         function signInRoutine() {
+                console.log("auth_token: " + auth_token);
+                localStorage.setItem('auth_token', auth_token);
+                $("#logOutButton").removeClass("disabled", 1000, "easeInBack").removeAttr("disabled");
+             $.ajaxPrefilter(function( options ) {
+                    if ( !options.beforeSend) {
+                        options.beforeSend = function (xhr) {
+                            xhr.setRequestHeader('Authorization', auth_token);
+                            xhr.setRequestHeader('Content-Type', "application/json");
+                        }
+                    }
+                });
+             $.get('/api/v1/user').done(function (data) {
+                 Materialize.toast("Welcome " + data.firstName, 4000);
+                 if(data.is_admin) {
+                     noticeModel.loggedIn(true);
+                 } else {
+                     Materialize.toast("But " + data.firstName + ", You are not an admin. :(", 4000);
+
+                 }
+             });
+            }
+        // Get user auth token
+        var auth_token = localStorage.getItem('auth_token');
+
+        if(auth_token) {
+            noticeModel.loggedIn(true);
+            signInRoutine();
+        } else {
+            var loginUrl = "/api/v1/login";
+            var loginPayload = JSON.stringify({
+                "id_token": id_token
+            });
+            $.ajax({
+                url: loginUrl,
+                type: "POST",
+                data: loginPayload,
+                headers: {
+                    "content-type": "application/json",
+                    "cache-control": "no-cache"
+                }
+            }).done(function (data) {
+                auth_token = data.auth_token;
+                signInRoutine();
+
+
+            }).fail(function () {
+                Materialize.toast("Sorry login failed. Please retry", 4000);
+            });
+
+
+        }
+
+
+
+       }
+    // Sign out callback
+    function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+     auth2.signOut().then(function () {
+       console.log('User signed out.');
+         noticeModel.loggedIn(false);
+         $("#logOutButton").addClass("disabled", 1000, "easeInBack").attr("disabled");
+         localStorage.removeItem("auth_token");
+
+     });
+    }
+      var NoticeModel = function () {
+        var self = this;
+
+        self.loggedIn = ko.observable(false);
+
+        self.loggedIn.subscribe(function (newValue) {
+              self.loggedIn(newValue);
+          })
+        };
+
+        self.noticeTitle = ko.observable();
+        self.noticeMessage = ko.observable();
+
+        self.sendNotice = function () {
+
+            var payload = {
+              "to_all": true,
+                "title": self.noticeTitle(),
+                "message": self.noticeMessage()
+            };
+            payload = ko.toJSON(payload);
+            console.log(payload);
+
+            $.ajax({
+               url: '/api/v1/admin/send',
+                type: "POST",
+                data: payload,
+                headers: {
+                    "Authorization": auth_token,
+                    "Content-Type": "application/json"
+                },
+                dataType: "json",
+                beforeSend: function () {
+                    $('.loader').show();
+                },
+                complete: function () {
+                    $('.loader').hide();
+                }
+            }).done(function (response) {
+                Materialize.toast("Message Sent. It will be on the air any minute now.", 4000);
+            });
+
+        };
+
+        var noticeModel = new NoticeModel();
+        ko.applyBindings(noticeModel);
+
+
+
+
+    </script>
+</body>
+</html>

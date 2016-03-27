@@ -38,9 +38,10 @@ apiv1.add_resource(UserSelf, '/user', endpoint='selfuser')
 
 # Add admin verification api
 apiv1.add_resource(Verify, '/admin/verified', endpoint='admin')
+apiv1.add_resource(Verify, '/admin/verify', methods=['POST'], endpoint='verify_user')
 
 #Add message sending admin api
-apiv1.add_resource(MessageHandler, '/admin/send', endpoint='messagehandler')
+apiv1.add_resource(MessageHandler, '/admin/send', endpoint='message_handler')
 
 # Register error handler
 @app.errorhandler(InvalidUsage)
