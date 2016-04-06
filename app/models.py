@@ -1,6 +1,5 @@
 from app import app, db
 from flask.ext.login import UserMixin
-from flask.ext.security import RoleMixin
 from flask import jsonify
 import jwt, datetime
 from pytz import timezone
@@ -25,7 +24,7 @@ roles_users = db.Table('roles_users',
 
 
 # Role model
-class Role(db.Model, RoleMixin):
+class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.deferred(db.Column(db.String(255), nullable=True))
@@ -47,7 +46,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True)
     firstName = db.Column(db.String(255), default='')
     lastName = db.Column(db.String(255), default='')
-    google_sub = db.Column(db.String, unique=True, index=True)
+    google_sub = db.Column(db.BigInteger, unique=True, index=True)
     verified = db.Column(db.Boolean, default=False)
     gcm_reg_id = db.deferred(db.Column(db.String, nullable=True))
     reg_date = db.deferred(db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now()))

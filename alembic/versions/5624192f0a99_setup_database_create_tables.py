@@ -34,7 +34,7 @@ def upgrade():
     sa.Column('firstName', sa.String(length=255), nullable=True),
     sa.Column('lastName', sa.String(length=255), nullable=True),
     sa.Column('univ_roll', sa.BigInteger(), nullable=True),
-    sa.Column('google_sub', sa.String(), nullable=True),
+    sa.Column('google_sub', sa.BigInteger(), nullable=True),
     sa.Column('verified', sa.Boolean(), nullable=True),
     sa.Column('gcm_reg_id', sa.String(), nullable=True),
     sa.Column('is_alumnus', sa.Boolean(), nullable=True),
