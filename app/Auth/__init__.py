@@ -39,7 +39,7 @@ def require_admin(func):
         g.user = user
         if user is None:
             raise UserNotFound
-        if 'admin' in user.roles:
+        if user.is_admin():
             return func(*args, **kwargs)
         else:
             raise NotAuthorized
