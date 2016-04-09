@@ -12,6 +12,7 @@ class RegistrationManager(Resource):
     def post(self):
         """
         Registers / logins user
+        Url: /register
         :return token: auth token
         """
         try:

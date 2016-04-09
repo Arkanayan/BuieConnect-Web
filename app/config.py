@@ -19,6 +19,7 @@ class DevelopmentConfig(Config):
     DATABASE_URI = "postgresql://testuser:password@127.0.0.1:5432/buieconnect"
     SQLALCHEMY_DATABASE_URI = DATABASE_URI
     SQLALCHEMY_ECHO = True
+    SERVER_NAME = "buieconnect.dev:5000"
 
 
 # Config for used on production

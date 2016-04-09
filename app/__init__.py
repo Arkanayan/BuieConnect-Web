@@ -24,4 +24,4 @@ app.register_blueprint(apiv1_bp, url_prefix='/api/v1')
 
 # import and register admin blueprint
 from app.admin import admin_bp
-app.register_blueprint(admin_bp, url_prefix='/admin')
+app.register_blueprint(admin_bp)
