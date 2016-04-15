@@ -1,6 +1,12 @@
 # BuieConnect-Web
 This the backend cloud code for BuieConnect app
 
+## Deploy requirements
+- **Environment variables:**
+    - _DATABASE_URI_ = \<Sqlalchemy format database uri\>
+    - _GCM_API_KEY_ = \<Google Cloud Messaging api key\>
+    - _CLIENT_ID_ = \<Google OAuth client id to get details of users\>
+    - _SECRET_KEY_ = \<Key used to encrypt tokens\>
 
 ## Urls
 - Base url: **__/api/v1__**
