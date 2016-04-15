@@ -13,7 +13,7 @@ This the backend cloud code for BuieConnect app
 - User operation urls
     - **_"/user"_** : 
         - Request methods allowed **GET**, **PUT**
-        - Require **Auth token**
+        - Require headers: **Auth token**
         - Returns 
             - **GET**: get details of the current user identified by the **token**
             - **PUT**: modifies the current user identified by the **token**
@@ -42,11 +42,11 @@ This the backend cloud code for BuieConnect app
 
     - **_"/users/\<id\>"_** : 
         - Request methods allowed **GET**, **PUT**
-        - Require **Auth token** of admin or the user
+        - Require headers: **Auth token** of admin or the user
         - Returns 
             - **GET**: without **id**, returns array of users
-            - **GET**: get details of the current user identified by **id**
-            - **PUT**: modifies the current user identified by **id**
+            - **GET**: with **id**, get details of the current user identified by **id**
+            - **PUT**: modifies the user identified by **id**
         - Example:
         ```javascript
         [
@@ -69,6 +69,21 @@ This the backend cloud code for BuieConnect app
               "id": 1
             }
         [
+        ```   
+    - **_"/notices/\<id\>"_** : 
+        - Request methods allowed **GET**
+        - Require headers: None
+        - Returns 
+            - **GET**: without **id**, returns array of notices
+            - **GET**: with **id**, returns details of the notice identified by **id**
+        - Example:
+        ```javascript
+            {
+              "id": 4,
+              "message": "Notice Message",
+              "title": "Notice title",
+              "url": "http://<site url>/api/v1/notices/4"
+            }
         ```
          
 ## Error Format
