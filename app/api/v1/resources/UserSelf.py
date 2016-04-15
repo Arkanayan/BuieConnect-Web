@@ -20,7 +20,9 @@ class UserSelf(Resource):
         try:
             user_update_schema = UserUpdateSchema(partial=True, strict=True)
             result = user_update_schema.load(request.json)
-            db.session.add(result.data)
+            updated_user = result.data
+            updated_user.set_modified()
+            db.session.add(updated_user)
             db.session.commit()
             return get_users_json(result.data)
         except NotAuthorized:

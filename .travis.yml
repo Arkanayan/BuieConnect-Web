@@ -2,4 +2,18 @@ language: python
 python:
   - "3.5"
 
-install: "pip install -r requirements.txt"
+services:
+  - postgresql
+
+before-script:
+  - psql -c 'buieconnect' -U postgres
+  - export SECRET_KEY=secret
+  - export DATABASE_URI=postgresql://postgres@127.0.0.1/buieconnect
+  - export CLIENT_ID=google_client_id
+  - export GCM_API_KEY=gcm_api_key
+
+install:
+  - "pip install -r requirements.txt"
+  - "alembic upgrade head"
+  - "chmod +x db_init.py"
+  - "python db_init.py"

@@ -50,6 +50,7 @@ class User(db.Model):
     verified = db.Column(db.Boolean, default=False)
     gcm_reg_id = db.deferred(db.Column(db.String, nullable=True))
     reg_date = db.deferred(db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now()))
+    date_modified = db.deferred(db.Column(db.DateTime(kolkata_time_zone), default=datetime.datetime.now()))
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
     #notices = db.relationship('Notice', backref=db.backref('author', lazy='dynamic'))
@@ -77,6 +78,9 @@ class User(db.Model):
     def __repr__(self):
         return "<User fName: {}, lName: {}, email: {}, isAdmin: {} >".format(self.firstName, self.lastName, self.email,
                                                                              self.is_admin())
+
+    def set_modified(self):
+        self.date_modified = datetime.datetime.now(kolkata_time_zone)
 
     def get_auth_token(self):
         """Generates user token
