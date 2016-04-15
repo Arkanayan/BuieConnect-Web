@@ -11,7 +11,7 @@ from .resources.UserAuth import UserAuth
 from .resources.UserManager import UserManager
 from .resources.UserSelf import UserSelf
 from .resources.notice import Notice
-from .resources.noticelist import NoticeList
+from .resources.Notices import NoticeList
 
 # Define Blueprint of api
 apiv1_bp = Blueprint('apiv1', __name__)
@@ -20,9 +20,9 @@ apiv1_bp = Blueprint('apiv1', __name__)
 apiv1 = Api(apiv1_bp)
 
 # Add url to notices class
-apiv1.add_resource(NoticeList, '/notices/', endpoint='notices')
+apiv1.add_resource(NoticeList, '/notices/', '/notices/<int:id>', endpoint='notices')
 # Add resource single notice to rest api
-apiv1.add_resource(Notice, '/notice/<int:id>', endpoint='notice')
+# apiv1.add_resource(NoticeList, '/notices/<int:id>', endpoint='notices')
 
 # Add login/userauth resource to rest api
 apiv1.add_resource(UserAuth, '/login', endpoint='login')

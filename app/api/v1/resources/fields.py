@@ -73,7 +73,7 @@ class NoticeSchema(Schema):
     url = filds.Method("notice_url", required=False)
 
     def notice_url(self, obj):
-        return url_for('apiv1.notice', id=obj.id, _external=True)
+        return url_for('apiv1.notices', id=obj.id, _external=True)
 
 
 class RoleSchema(marsh.ModelSchema):
