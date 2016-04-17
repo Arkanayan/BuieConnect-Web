@@ -17,3 +17,8 @@ install:
   - "alembic upgrade head"
   - "chmod +x db_init.py"
   - "python db_init.py"
+
+notifications:
+    email:
+        on_success: change
+        on_failure: change

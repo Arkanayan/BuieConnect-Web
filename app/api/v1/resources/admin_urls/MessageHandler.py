@@ -7,6 +7,7 @@ from app.gcm_utils import send_message, send_to_all
 from app.models import User, Notice
 from app import db
 from app import Auth
+from app.Utils import Message
 
 # URL /admin/send
 class MessageHandler(Resource):
@@ -16,10 +17,15 @@ class MessageHandler(Resource):
         try:
             admin_user = g.get("user", None)
             payload = MessagePayload(strict=True).load(request.get_json())
-            data = {
+            message_data = {
                     "title": payload.data.pop("title", ""),
                     "message": payload.data.pop("message", "")
                 }
+            message_type = payload.data.pop("type", Message.Type.notice.name)
+            data = {
+                "type" : message_type,
+                "data" : message_data
+            }
             # print(data)
             if "to" in payload.data:
                 user_ids = payload.data['to']
@@ -33,10 +39,13 @@ class MessageHandler(Resource):
                          "successful": True}
 
             elif "to_all" in payload.data:
-                # send the data to all usersr
+                # send the data to all users
                 response = send_to_all(data)
-                # Add notice to database
-                notice = Notice(data["title"], data["message"], admin_user)
+                # print("data: ", data)
+                # print("response: ", response)
+
+                # store notice to database
+                notice = Notice(message_data["title"], message_data["message"], admin_user)
                 db.session.add(notice)
                 db.session.commit()
 
