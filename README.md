@@ -7,6 +7,7 @@ This the backend cloud code for BuieConnect app
     - _GCM_API_KEY_ = \<Google Cloud Messaging api key\>
     - _CLIENT_ID_ = \<Google OAuth client id to get details of users\>
     - _SECRET_KEY_ = \<Key used to encrypt tokens\>
+    - _FIREBASE_SECRET_ = \<Firebase app secret\>
 
 ## Urls
 - Base url: **__/api/v1__**
